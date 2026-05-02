@@ -1,7 +1,7 @@
 #imports
 import sympy as sp
 import random
-from mylecturer import (
+from project import (
     Problem, Step, Solution, TutorError,
     extract_symbols, to_latex, apply_ics, add_domain_and_verify,
     make_ic, make_problem_data,

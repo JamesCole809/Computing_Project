@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyLecturer</title>
+  <link rel="stylesheet" href="/style.css">
+  <script>
+    MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
+</head>
+<body>
+  <header>
+    <h1>MyLecturer</h1>
+    <p>ODE Practice Tool</p>
+  </header>
+
+  <div id="layout">
+    <div id="col-left">
+      <h2>Controls</h2>
+      <label for="kindSelect">ODE Kind</label>
+      <select id="kindSelect"></select>
+
+      <label for="difficultySelect">Difficulty</label>
+      <select id="difficultySelect">
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+
+      <label class="toggle-label">
+        <input id="icsToggle" type="checkbox" checked>
+        Include initial conditions
+      </label>
+
+      <div id="buttons">
+        <button id="generateBtn">Generate</button>
+        <button id="solveBtn" disabled>Solve</button>
+      </div>
+    </div>
+
+    <div id="col-middle">
+      <div id="problemPrompt" class="card placeholder">
+        <h2>Problem</h2>
+        <p class="placeholder-text">Generate a problem</p>
+      </div>
+      <div id="spinner" class="hidden">Solving...</div>
+      <div id="stepsContainer" class="hidden">
+        <h2>Solution Steps</h2>
+      </div>
+    </div>
+
+    <div id="col-right">
+      <div id="answerCard" class="card placeholder">
+        <h2>Result</h2>
+        <p class="placeholder-text">Solve a problem</p>
+      </div>
+      <div id="plotCard" class="card hidden">
+        <h2>Plot</h2>
+        <img id="plotImg" alt="Solution plot">
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
