@@ -17,7 +17,13 @@ We present a Python library for generating and solving differential equations fo
 Students often require a large number of practice problems to develop confidence in solving differential equations. Although existing tools such as SymPy provide powerful symbolic computation, they are not specifically designed for guided practice. It requires prior understanding and can be time-consuming for users to define problems manually. This project addresses this need by automatically generating valid differential equations and providing corresponding solutions, making it easier for students to practice and learn.
 
 \section{Functionality}
-The library supports a range of differential equation types: first-order linear, separable, Bernoulli, second-order constant-coefficient, and systems of equations. Each equation type is implemented in its own module, with two main components: a generator and a solver. The generator creates valid equations by randomly selecting coefficients and constructing expressions that follow known solvable forms. The solver computes symbolic solutions using established mathematical methods.
+The library supports a range of differential equation types: first-order linear, separable, Bernoulli, second-order constant-coefficient equations, and systems of equations. Each equation type is implemented in its own module, with two main components: a generator and a solver. The generator creates valid equations by randomly selecting coefficients and constructing expressions that follow known solvable forms, for example:
+
+\[
+\frac{dy}{dx} = x y
+\]
+
+The solver computes symbolic solutions using established mathematical methods via the SymPy library.
 
 The system also includes a function to generate complete problem sheets, which can be optionally exported as formatted PDF documents. This allows users to create structured worksheets for practice or teaching purposes.
 
@@ -28,14 +34,15 @@ Symbolic computation tools such as SymPy offer a wide range of capabilities for 
 To ensure the software's correctness, a comprehensive suite of automated tests was implemented using the pytest framework. These tests verified that the generated differential equations are valid and that the corresponding solver functions return correct symbolic solutions. The test suite covers all supported equation types and includes a range of cases to ensure robustness. Running tests yielded 118 successful results, confirming that the library's core functionality behaves as expected.
 
 \section{Conclusion}
-This project demonstrates a modular and extensible approach to generating and solving differential equations. Combining symbolic computation with automated problem generation provides a useful tool for students and educators. Future improvements could include more detailed step-by-step solutions and support for additional equation types.
+This project demonstrates a modular and extensible approach to generating and solving differential equations. Combining symbolic computation with automated problem generation provides a useful tool for students and educators.
+
+However, the system has some limitations. The step-by-step solutions are conceptual rather than fully derived, and only predefined equation types are supported. Future improvements could include more detailed solution steps and support for additional classes of differential equations.
 
 \section{References}
 
 \begin{itemize}
 \item SymPy Development Team. SymPy: Python library for symbolic mathematics. Available at: \url{https://www.sympy.org}
 \item Wolfram Alpha LLC. Wolfram Alpha computational engine. Available at: \url{https://www.wolframalpha.com}
-\item Boyce, W. E., \& DiPrima, R. C. (2017). Elementary Differential Equations and Boundary Value Problems.
 \end{itemize}
 
 
