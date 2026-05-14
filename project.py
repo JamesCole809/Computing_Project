@@ -307,7 +307,7 @@ def list_kinds():
         kinds.extend(TOPICS[topic])
     return kinds
 
-def help(): #Had to use AI to make this as it kept printing horribly when I tried to do it
+def help(): #Had to use extra help to make this as my code kept causing it to print horribly
     print("""
 ml.generate(kind, difficulty, with_ics, seed) -> Problem
     .kind           - ODE type e.g. "ode1_linear"
