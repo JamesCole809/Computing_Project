@@ -11,32 +11,162 @@
 \maketitle
 
 \section{Summary}
-We present a Python library for generating and solving differential equations for educational purposes. The system allows students to practise solving equations by automatically generating problems across multiple categories and providing symbolic solutions. The goal is to create an accessible and flexible learning tool for students studying introductory differential equations.
+We made a Python library that creates and solves differential equations so that students can practise. It picks coefficients at random, builds a valid equation, and then gives back a full solution with the working shown step by step. The aim is to give students an easy way to get as many practice problems as they want without having to write them by hand.
 
 \section{Statement of Need}
-Students often require a large number of practice problems to develop confidence in solving differential equations. Although existing tools such as SymPy provide powerful symbolic computation, they are not specifically designed for guided practice. It requires prior understanding and can be time-consuming for users to define problems manually. This project addresses this need by automatically generating valid differential equations and providing corresponding solutions, making it easier for students to practice and learn.
+When you are learning ODEs you need to do a lot of them before it really sticks. Textbooks only have a fixed number of examples and once you have seen them once they are not much use. Tools like SymPy can solve an ODE for you but you have to type the equation in yourself, and Wolfram Alpha is the same. Neither one is built for making practice questions in bulk. Our library fills this gap. You ask it for a question of a certain type and difficulty and it gives you both the question and the worked solution, so you can try it yourself first and then check.
 
 \section{Functionality}
-The library supports a range of differential equation types: first-order linear, separable, Bernoulli, second-order constant-coefficient equations, and systems of equations. Each equation type is implemented in its own module, with two main components: a generator and a solver. The generator creates valid equations by randomly selecting coefficients and constructing expressions that follow known solvable forms, for example:
+The library covers seven types of ODE:
+\begin{itemize}
+    \item First order linear
+    \item Separable
+    \item Bernoulli
+    \item Homogeneous (using the substitution $z = y/x$)
+    \item Second order with constant coefficients (homogeneous)
+    \item Second order with constant coefficients (inhomogeneous)
+    \item Coupled first order linear ODEs
+\end{itemize}
 
+Each one lives in its own module and has two parts, a generator and a solver. The generator picks random coefficients (with added parameters to match Dr Lydia Buckingham's style) and builds an equation of the right form. The solver does the working using SymPy and returns a list of steps along with the final answer. There is also a function that makes a full problem sheet and can export it as a PDF, which is helpful for revising.
+
+\section{How We Solve Each Type}
+
+This section walks through what the solver does for each type. We tried to follow the same methods we were taught in lectures.
+
+\subsection{First order linear}
+The standard form is
 \[
-\frac{dy}{dx} = x y
+\frac{dy}{dx} + p(x)\, y = q(x).
 \]
+\begin{enumerate}
+    \item Read off $p(x)$ and $q(x)$. If the coefficient of $y'$ is not 1 we divide through first.
+    \item Work out the integrating factor
+    \[
+        I(x) = e^{\int p(x)\,dx}.
+    \]
+    \item Multiply the whole equation by $I(x)$. The left hand side now becomes $\frac{d}{dx}\big[I(x)\,y\big]$, which is just the product rule in reverse.
+    \item Integrate both sides with respect to $x$, remembering to add the constant $C_1$.
+    \item Divide by $I(x)$ to get $y$ on its own. This is the general solution.
+    \item If an initial condition is given, plug it in and solve for $C_1$.
+\end{enumerate}
 
-The solver computes symbolic solutions using established mathematical methods via the SymPy library.
+\subsection{Separable}
+The form here is
+\[
+g(y)\,\frac{dy}{dx} = f(x).
+\]
+\begin{enumerate}
+    \item Identify $g(y)$ and $f(x)$.
+    \item Separate the variables so all the $y$ stuff is on one side and all the $x$ stuff on the other.
+    \item Integrate each side. This gives an implicit relation between $x$ and $y$ plus a constant $C_1$.
+    \item Try to rearrange for $y$ explicitly. Sometimes you can, sometimes you have to leave it implicit.
+    \item If there is an initial condition, sub it in to find $C_1$.
+\end{enumerate}
 
-The system also includes a function to generate complete problem sheets, which can be optionally exported as formatted PDF documents. This allows users to create structured worksheets for practice or teaching purposes.
+\subsection{Bernoulli}
+A Bernoulli equation looks like
+\[
+\frac{dy}{dx} + a(x)\, y = b(x)\, y^n,
+\]
+where $n$ is not 0 or 1 (otherwise it would just be linear).
+\begin{enumerate}
+    \item Rearrange into the form above and read off $a(x)$, $b(x)$ and $n$.
+    \item Use the substitution $z = y^{1-n}\, e^{(1-n)\int a\,dx}$. Differentiating $z$ and substituting the original ODE makes the $y$ terms cancel.
+    \item You are left with $\frac{dz}{dx}$ equal to a function of $x$ only, so integrate it.
+    \item Add the constant $C_1$ and then sub back $y = z^{1/(1-n)} / e^{\int a\,dx}$ to recover $y$.
+    \item Apply the initial condition if there is one.
+\end{enumerate}
+
+\subsection{Homogeneous ($z = y/x$ substitution)}
+This is for equations of the form
+\[
+\frac{dy}{dx} = f\!\left(\frac{y}{x}\right).
+\]
+\begin{enumerate}
+    \item Check that the right hand side really is a function of $y/x$ only.
+    \item Let $z = y/x$ so $y = zx$. By the product rule $\frac{dy}{dx} = x\frac{dz}{dx} + z$.
+    \item Substitute this in to get $x\frac{dz}{dx} = f(z) - z$, which is now separable.
+    \item Separate the variables and integrate both sides. The right side gives $\ln|x| + C_1$.
+    \item Substitute $z = y/x$ back in and rearrange for $y$ if you can.
+    \item Also check if $f(z) - z = 0$ has any roots, because those give extra constant solutions $y = z_0 x$ that can otherwise be missed.
+    \item Apply the initial condition.
+\end{enumerate}
+
+\subsection{Second order, constant coefficients, homogeneous}
+The form is
+\[
+a\,y'' + b\,y' + c\,y = 0,
+\]
+where $a$, $b$, $c$ are constants.
+\begin{enumerate}
+    \item Write down the auxiliary equation $a\mu^2 + b\mu + c = 0$ and solve for $\mu$.
+    \item Look at the discriminant $b^2 - 4ac$ and split into three cases:
+    \begin{itemize}
+        \item Two real distinct roots $\mu_1$, $\mu_2$:
+        \[
+            y = A\,e^{\mu_1 x} + B\,e^{\mu_2 x}.
+        \]
+        \item One repeated root $\mu$:
+        \[
+            y = A\,e^{\mu x} + B\,x\,e^{\mu x}.
+        \]
+        \item Complex roots $p \pm iq$:
+        \[
+            y = e^{px}\big(A\cos(qx) + B\sin(qx)\big).
+        \]
+    \end{itemize}
+    \item This gives you the general solution with two constants $A$ and $B$.
+    \item If you have two initial conditions, sub them in (and differentiate once for $y'$) and solve the resulting system for $A$ and $B$.
+\end{enumerate}
+
+\subsection{Second order, constant coefficients, inhomogeneous}
+Now the form is
+\[
+a\,y'' + b\,y' + c\,y = f(x).
+\]
+\begin{enumerate}
+    \item First find the complementary function $y_c$ by solving the homogeneous version (same method as above).
+    \item Pick a trial particular solution $y_p$ that matches the type of $f(x)$:
+    \begin{itemize}
+        \item If $f(x)$ is a constant, try $y_p = C$.
+        \item If $f(x)$ is a polynomial of degree $n$, try a general polynomial of degree $n$.
+        \item If $f(x)$ is $e^{kx}$, try $y_p = C_1 e^{kx} + C_2$.
+        \item If $f(x)$ is $\sin(\theta x)$ or $\cos(\theta x)$, try $y_p = C_1 \cos(\theta x) + C_2 \sin(\theta x)$.
+    \end{itemize}
+    \item If your trial overlaps with anything in $y_c$, multiply it by $x$ (and again by $x$ if it still clashes).
+    \item Sub $y_p$ into the ODE, expand, and compare coefficients to find the unknown $C$ values. (In our code we plug in numbers for $x$ and solve a small linear system instead, but it gives the same answer.)
+    \item The general solution is $y = y_c + y_p$.
+    \item Apply initial conditions if given.
+\end{enumerate}
+
+\subsection{System of two first order linear ODEs}
+The form is
+\[
+\frac{du}{dx} = a\,u + b\,v, \qquad \frac{dv}{dx} = c\,u + d\,v.
+\]
+\begin{enumerate}
+    \item Differentiate the first equation once more.
+    \item Use the second equation to replace $\frac{dv}{dx}$, and rearrange the first equation to write $v$ in terms of $u$ and $u'$.
+    \item Sub everything back so that you end up with one second order ODE in $u$ only.
+    \item Solve that second order ODE using the constant coefficient methods above. This gives $u$ with constants $A$ and $B$.
+    \item Recover $v$ from the relation you got in step 2.
+    \item If initial conditions are given for both $u(0)$ and $v(0)$, sub them in and solve for $A$ and $B$.
+\end{enumerate}
+
+\section{Verifying the Answer}
+After solving, the library checks the answer by plugging it back into the original ODE and seeing if everything cancels to zero. It also checks the initial conditions if there are any. This way the user (and us) can be confident the solver is not making things up. For implicit solutions we use implicit differentiation to recover $y'$ before substituting.
 
 \section{State of the Field}
-Symbolic computation tools such as SymPy offer a wide range of capabilities for solving differential equations. However, they require users to explicitly define equations and are not tailored for generating practice material. Other tools, such as Wolfram Alpha, can solve equations but are not easily programmable or suitable for generating problems in batches. In contrast, this project focuses specifically on automated problem generation and educational use, providing a simpler interface for students.
+SymPy is very powerful but it expects you to already have a written equation. Wolfram Alpha is similar and also is not really designed to be scripted. Our project sits in between, it takes the heavy maths work that SymPy is good at and wraps it in a simpler interface aimed at students who just want practice problems.
 
 \section{Testing}
-To ensure the software's correctness, a comprehensive suite of automated tests was implemented using the pytest framework. These tests verified that the generated differential equations are valid and that the corresponding solver functions return correct symbolic solutions. The test suite covers all supported equation types and includes a range of cases to ensure robustness. Running tests yielded 118 successful results, confirming that the library's core functionality behaves as expected.
+We wrote a pytest test suite that checks both the generators and the solvers. The generator tests check that each problem is built correctly and is of the type it claims to be. The solver tests run a sample of problems and verify the answers symbolically. The test file passes 118 tests covering all seven ODE types and the problem sheet exporter.
 
 \section{Conclusion}
-This project demonstrates a modular and extensible approach to generating and solving differential equations. Combining symbolic computation with automated problem generation provides a useful tool for students and educators.
+The project shows a working, modular way of generating ODE practice problems with full step by step solutions. It is mostly aimed at first year maths and engineering students who want extra practice past what their textbook gives them. We are likely to open-source this at the end of the year in the event of future first years in need of an infinite supply of problem sheets.
 
-However, the system has some limitations. The step-by-step solutions are conceptual rather than fully derived, and only predefined equation types are supported. Future improvements could include more detailed solution steps and support for additional classes of differential equations.
+There are still things we would like to improve. The step explanations are short and could be more detailed. We also only cover seven types of ODE, so adding things like exact equations, or higher order systems would be a nice extension (third order ODE's would have been useful to practice before the exam). The frontend is fairly basic and could be made nicer too but as this is not within our skillset for now this is unlikely to be changed any time soon.
 
 \section{References}
 
@@ -44,6 +174,5 @@ However, the system has some limitations. The step-by-step solutions are concept
 \item SymPy Development Team. SymPy: Python library for symbolic mathematics. Available at: \url{https://www.sympy.org}
 \item Wolfram Alpha LLC. Wolfram Alpha computational engine. Available at: \url{https://www.wolframalpha.com}
 \end{itemize}
-
 
 \end{document}
