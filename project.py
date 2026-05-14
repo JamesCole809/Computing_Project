@@ -2,9 +2,11 @@ import sympy as sp
 import re
 
 class TutorError(Exception):
+    """Errors raised by the library so we can catch them separately from random sympy ones"""
     pass
 
 class Problem:
+    """A generated ODE question (kind, prompt and the data the solver needs)"""
     def __init__(self, kind, prompt, data=None, metadata=None):
         self.kind = kind
         self.prompt = prompt
@@ -16,6 +18,7 @@ class Problem:
 
 
 class Step:
+    """One line of working: a title, the maths, and a short explanation"""
     def __init__(self, title, math, explanation):
         self.title = title
         self.math = math
@@ -26,6 +29,7 @@ class Step:
 
 
 class Solution:
+    """The answer plus the working that got us there"""
     def __init__(self, kind, final_answer, answer_expr=None,
                  steps=None, verified=None, verify_msg="",
                  warnings=None):
@@ -43,6 +47,7 @@ class Solution:
         return f"${self.final_answer}$"
 
     def show_steps(self):
+        """Print every step nicely (rendered in LaTeX if we're in Jupyter)"""
         try:
             from IPython.display import display, Math, Markdown
             for s in self.steps:
@@ -251,6 +256,7 @@ def latex_prompt(problem):
 from diff_eq import TOPICS, SOLVERS, GENERATORS
 
 def generate(kind, difficulty="easy", with_ics=True, seed=None):
+    """Build a random ODE problem. Pass kind="mixed" to pick at random"""
     import random
     if seed is not None:
         random.seed(seed)
@@ -263,11 +269,13 @@ def generate(kind, difficulty="easy", with_ics=True, seed=None):
     return problem
 
 def solve(problem, want_steps=True, want_verify=True):
+    """Solve a Problem and return a Solution with the working"""
     if problem.kind not in SOLVERS:
         raise TutorError(f"Unknown: {problem.kind}")
     return SOLVERS[problem.kind](problem, want_steps, want_verify)
 
 def check(problem, result):
+    """Quick yes/no check that the answer satisfies the ODE"""
     d = problem.data
     if len(d["functions"]) == 1:
         ok, msg = verify_scalar(problem, result.answer_expr)
@@ -277,6 +285,7 @@ def check(problem, result):
     return {"verified": ok, "message": msg}
 
 def export_latex(result, problem=None):
+    """Return a LaTeX block of the worked solution (and the problem if given)"""
     lines = []
     if problem is not None:
         lines.append(r"\textbf{Problem}")
@@ -299,15 +308,17 @@ def export_latex(result, problem=None):
     return "\n".join(lines)
 
 def list_topics():
+    """All topic names (just 'ode' for now)"""
     return list(TOPICS.keys())
 
 def list_kinds():
+    """All the ODE kind names we can generate"""
     kinds = []
     for topic in TOPICS:
         kinds.extend(TOPICS[topic])
     return kinds
 
-def help(): #Had to use extra help to make this as my code kept causing it to print horribly
+def help():
     print("""
 ml.generate(kind, difficulty, with_ics, seed) -> Problem
     .kind           - ODE type e.g. "ode1_linear"
@@ -338,6 +349,7 @@ Jupyter: Problems and Solutions auto-render LaTeX when displayed in cells.
 """)
 
 def problem_sheet(n=5, kind="ode1_linear", difficulty="mixed", export=False, saveto=None, seed=None):
+    """Build n random questions of a given kind and optionally save them as a PDF"""
     import random
     if seed is not None:
         random.seed(seed)
@@ -398,6 +410,7 @@ def problem_sheet(n=5, kind="ode1_linear", difficulty="mixed", export=False, sav
     return questions
 
 def launch_web(host="127.0.0.1", port=8080, open_browser=True):
+    """Start the small Flask UI in a browser tab"""
     import threading, webbrowser, logging
     from frontend.app import app
     log = logging.getLogger("werkzeug")

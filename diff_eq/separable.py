@@ -7,13 +7,8 @@ from project import (
     make_ic, make_problem_data,
 )
 
-'''
-I dont think theres much of a need for me to have to comment each file as they
-are all pretty much the same kind of logic just different steps to solve the basic
-ODE's in the same way we are taught.
-'''
-
 def solve_ode1_separable(problem, want_steps, want_verify):
+    """Separable ODE: split variables and integrate both sides"""
     d = problem.data
     x, y = extract_symbols(problem)
     eq = d["equations"]
@@ -26,7 +21,7 @@ def solve_ode1_separable(problem, want_steps, want_verify):
     f_x = -sp.simplify(expr - g_y * dy)
 
     if g_y == 0:
-        raise TutorError("No y' for seperable form")
+        raise TutorError("No y' term for separable form")
 
     if want_steps:
         steps.append(Step("Rearrange for separable form",
@@ -98,6 +93,7 @@ def solve_ode1_separable(problem, want_steps, want_verify):
 
 
 def gen_ode1_separable(difficulty, with_ics=True):
+    """Make a random separable ODE"""
     x = sp.Symbol("x")
     y = sp.Function("y")(x)
 

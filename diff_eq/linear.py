@@ -9,6 +9,7 @@ from project import (
 
 #function that solves ode
 def solve_ode1_linear(problem, want_steps, want_verify):
+    """First order linear ODE using the integrating factor method"""
     #shortcuts
     d = problem.data
     x, y = extract_symbols(problem)
@@ -108,6 +109,7 @@ def solve_ode1_linear(problem, want_steps, want_verify):
 
 #function to generate random problems
 def gen_ode1_linear(difficulty, with_ics=True):
+    """Make a random first order linear ODE"""
     x = sp.Symbol("x")
     y = sp.Function("y")(x)
 

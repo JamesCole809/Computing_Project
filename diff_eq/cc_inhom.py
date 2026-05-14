@@ -6,8 +6,6 @@ from project import (
     make_ic, make_problem_data,
 )
 
-#This one too way too long
-
 def format_dict(d):
     parts = sorted(d.items(), key=lambda kv: str(kv[0]))
     return ", \\; ".join(f"{sp.latex(k)} = {sp.latex(v)}" for k, v in parts)
@@ -26,7 +24,7 @@ def get_complementary(a_coeff, b_coeff, c_coeff, x):
     disc_zero = disc.is_zero
     disc_neg = disc.is_negative
 
-    #idk if this is the right way tbh, sympy kept returning None on the sign so just did it numerically. seems to work
+    #sympy kept returning None on the sign so just did it numerically
     if disc_pos is None or disc_zero is None or disc_neg is None:
         try:
             disc_num = float(sp.N(disc))
@@ -39,7 +37,7 @@ def get_complementary(a_coeff, b_coeff, c_coeff, x):
     if disc_pos:
         if len(roots) != 2:
             raise TutorError("Expected two distinct roots but got unexpected root")
-        # sort just so output is consistent, not really needed
+        #sort just so output is consistent
         try:
             mu1, mu2 = sorted(roots, key=lambda r: float(sp.N(r)))
         except (TypeError, ValueError):
@@ -107,8 +105,7 @@ def term_trial(rest, x, idx):
 
 
 def check_overlap(sub_trial, yc, x):
-    #multiply by x if test clashes with yc, 3 loops should be enough hopefully
-
+    #multiply by x if test clashes with yc, 3 loops should be enough
     for _ in range(3):
         overlap = False
         for t in sp.Add.make_args(yc):
@@ -133,7 +130,7 @@ def build_trial(f_x, x, yc):
     undetermined = []
     idx = 0
     total = 0
-    #avoid duplicate test terms as I was getting double unknowns without these
+    #avoid duplicate test terms otherwise we get double unknowns
     seen_trig_args = set()
     seen_exp_bases = set()
 
@@ -169,6 +166,7 @@ def build_trial(f_x, x, yc):
 
 
 def solve_ode2_cc_inhom(problem, want_steps, want_verify):
+    """Second order constant coefficient inhomogeneous ODE: y = y_c + y_p"""
     d = problem.data
     x, y = extract_symbols(problem)
     eq = d["equations"]
@@ -189,7 +187,7 @@ def solve_ode2_cc_inhom(problem, want_steps, want_verify):
 
     remainder = sp.simplify(expr - (a_coeff * d2y + b_coeff * dy + c_coeff * y - f_x))
     if remainder != 0 and remainder.equals(0) is False:
-        raise TutorError("Couldn't put nto standard inhomogeneous form")
+        raise TutorError("Couldn't put into standard inhomogeneous form")
 
     for name, coeff in [("a", a_coeff), ("b", b_coeff), ("c", c_coeff)]:
         if x in coeff.free_symbols:
@@ -228,9 +226,8 @@ def solve_ode2_cc_inhom(problem, want_steps, want_verify):
 
     diff_expr = sp.expand(lhs_sub - rhs_expanded)
 
-    #In lectures we just equate coefficients of like terms but couldn't get
-    # that working with sympy, so plugging in numbers for x to make a system
-    # of linear equations instead. probably not the proper way but it works
+    #In lectures we equate coefficients of like terms, here we plug in
+    #numbers for x and solve a small linear system instead. same answer
     n_unknowns = len(undetermined)
     coeff_vals = None
     for offset in range(3):
@@ -304,6 +301,7 @@ def solve_ode2_cc_inhom(problem, want_steps, want_verify):
 
 
 def gen_ode2_cc_inhom(difficulty, with_ics=True):
+    """Make a random second order CC inhomogeneous ODE"""
     x = sp.Symbol("x")
     y = sp.Function("y")(x)
 

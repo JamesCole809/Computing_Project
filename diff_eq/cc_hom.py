@@ -6,9 +6,10 @@ from project import (
     make_ic, make_problem_data,
 )
 
-#File for constant coefficient homogenous ODE's
+#File for constant coefficient homogeneous ODEs
 
 def solve_ode2_cc_hom(problem, want_steps, want_verify):
+    """Second order constant coefficient homogeneous ODE via the auxiliary equation"""
     d = problem.data
     x, y = extract_symbols(problem)
     eq = d["equations"]
@@ -125,6 +126,7 @@ def solve_ode2_cc_hom(problem, want_steps, want_verify):
 
 
 def gen_ode2_cc_hom(difficulty, with_ics=True):
+    """Make a random second order CC homogeneous ODE"""
     x = sp.Symbol("x")
     y = sp.Function("y")(x)
 

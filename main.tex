@@ -14,7 +14,7 @@
 We made a Python library that creates and solves differential equations so that students can practise. It picks coefficients at random, builds a valid equation, and then gives back a full solution with the working shown step by step. The aim is to give students an easy way to get as many practice problems as they want without having to write them by hand.
 
 \section{Statement of Need}
-When you are learning ODEs you need to do a lot of them before it really sticks. Textbooks only have a fixed number of examples and once you have seen them once they are not much use. Tools like SymPy can solve an ODE for you but you have to type the equation in yourself, and Wolfram Alpha is the same. Neither one is built for making practice questions in bulk. Our library fills this gap. You ask it for a question of a certain type and difficulty and it gives you both the question and the worked solution, so you can try it yourself first and then check.
+When you are learning ODEs you need to do a lot of them before it really sticks. Standard textbooks such as Boyce and DiPrima~\cite{boyce} only have a fixed number of examples and once you have seen them once they are not much use. Tools like SymPy~\cite{sympy} can solve an ODE for you but you have to type the equation in yourself, and Wolfram Alpha~\cite{wolframalpha} is the same. Neither one is built for making practice questions in bulk. Our library fills this gap. You ask it for a question of a certain type and difficulty and it gives you both the question and the worked solution, so you can try it yourself first and then check.
 
 \section{Functionality}
 The library covers seven types of ODE:
@@ -158,21 +158,71 @@ The form is
 After solving, the library checks the answer by plugging it back into the original ODE and seeing if everything cancels to zero. It also checks the initial conditions if there are any. This way the user (and us) can be confident the solver is not making things up. For implicit solutions we use implicit differentiation to recover $y'$ before substituting.
 
 \section{State of the Field}
-SymPy is very powerful but it expects you to already have a written equation. Wolfram Alpha is similar and also is not really designed to be scripted. Our project sits in between, it takes the heavy maths work that SymPy is good at and wraps it in a simpler interface aimed at students who just want practice problems.
+Several established systems already deal with differential equations. SymPy~\cite{sympy} is a Python computer algebra library and it is what powers our solver under the hood, since it integrates directly with normal Python code. Other general-purpose computer algebra systems include Maxima~\cite{maxima}, the open-source SageMath~\cite{sagemath} (which itself bundles SymPy and Maxima among others), and the commercial packages Mathematica~\cite{mathematica} and Maple. Online tools such as Wolfram Alpha~\cite{wolframalpha} can solve a given equation on demand but are aimed at one-off lookups rather than at producing batches of fresh practice problems. Textbooks such as Boyce and DiPrima~\cite{boyce} are still the standard reference for an undergraduate course but again only contain a fixed pool of examples.
+
+None of these are set up to act as a self-contained problem generator for a first year student. Our library is much smaller in scope than any of the systems above but fills exactly that gap. In spirit it is similar to the small focused Python tools published in the Journal of Open Source Software, for example Nashpy~\cite{nashpy} for Nash equilibria and Matching~\cite{matching} for matching games, both of which wrap a specific bit of mathematics in a simple educational interface.
 
 \section{Testing}
-We wrote a pytest test suite that checks both the generators and the solvers. The generator tests check that each problem is built correctly and is of the type it claims to be. The solver tests run a sample of problems and verify the answers symbolically. The test file passes 118 tests covering all seven ODE types and the problem sheet exporter.
+We wrote a pytest~\cite{pytest} test suite that checks both the generators and the solvers. The generator tests check that each problem is built correctly and is of the type it claims to be. The solver tests run a sample of problems and verify the answers symbolically. The test file passes 118 tests covering all seven ODE types and the problem sheet exporter. The documentation in \texttt{README.md} also contains runnable examples checked with \texttt{doctest}, so the examples shown to the user are guaranteed to still produce the output the docs claim.
 
 \section{Conclusion}
-The project shows a working, modular way of generating ODE practice problems with full step by step solutions. It is mostly aimed at first year maths and engineering students who want extra practice past what their textbook gives them. We are likely to open-source this at the end of the year in the event of future first years in need of an infinite supply of problem sheets.
+The project shows a working, modular way of generating ODE practice problems with full step by step solutions. It is mostly aimed at first year Cardiff Mathematics students who want extra practice past what their textbook gives them. The documentation follows the Diataxis framework~\cite{diataxis} with a Tutorial, How-to, Explanation and Reference section so that a new user can pick up the library quickly. We are likely to open-source this at the end of the year in the event of future first years in need of an infinite supply of problem sheets.
 
 There are still things we would like to improve. The step explanations are short and could be more detailed. We also only cover seven types of ODE, so adding things like exact equations, or higher order systems would be a nice extension (third order ODE's would have been useful to practice before the exam). The frontend is fairly basic and could be made nicer too but as this is not within our skillset for now this is unlikely to be changed any time soon.
 
-\section{References}
+\begin{thebibliography}{9}
 
-\begin{itemize}
-\item SymPy Development Team. SymPy: Python library for symbolic mathematics. Available at: \url{https://www.sympy.org}
-\item Wolfram Alpha LLC. Wolfram Alpha computational engine. Available at: \url{https://www.wolframalpha.com}
-\end{itemize}
+\bibitem{sympy}
+Meurer, A. et al.
+\emph{SymPy: symbolic computing in Python}.
+PeerJ Computer Science, 3:e103, 2017.
+\url{https://www.sympy.org}
+
+\bibitem{maxima}
+Maxima Development Team.
+\emph{Maxima, a Computer Algebra System}.
+\url{https://maxima.sourceforge.io}
+
+\bibitem{sagemath}
+The Sage Developers.
+\emph{SageMath, the Sage Mathematics Software System}.
+\url{https://www.sagemath.org}
+
+\bibitem{mathematica}
+Wolfram Research, Inc.
+\emph{Mathematica}, Version 13.
+\url{https://www.wolfram.com/mathematica}
+
+\bibitem{wolframalpha}
+Wolfram Alpha LLC.
+\emph{Wolfram Alpha computational engine}.
+\url{https://www.wolframalpha.com}
+
+\bibitem{boyce}
+Boyce, W. E. and DiPrima, R. C.
+\emph{Elementary Differential Equations and Boundary Value Problems},
+11th edition. Wiley, 2017.
+
+\bibitem{diataxis}
+Procida, D.
+\emph{The Diataxis documentation framework}.
+\url{https://diataxis.fr}
+
+\bibitem{pytest}
+Krekel, H. et al.
+\emph{pytest: helps you write better programs}.
+\url{https://docs.pytest.org}
+
+\bibitem{nashpy}
+Knight, V.
+\emph{Nashpy: A Python library for the computation of Nash equilibria}.
+Journal of Open Source Software, 3(30):904, 2018.
+
+\bibitem{matching}
+Wilde, H. and Knight, V.
+\emph{Matching: A Python library for solving matching games}.
+Journal of Open Source Software, 5(48):2169, 2020.
+
+\end{thebibliography}
 
 \end{document}

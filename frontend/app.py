@@ -1,5 +1,3 @@
-#Also needed some help with this from my friend
-
 import sys
 import os
 import io

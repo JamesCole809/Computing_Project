@@ -10,6 +10,7 @@ from project import (
 
 #Function that solves the ODE (first order bernoulli)
 def solve_ode1_bernoulli(problem, want_steps, want_verify):
+    """Bernoulli ODE via the substitution z = y^(1-n) * e^((1-n) integral a dx)"""
     #shortcut to problem data
     d = problem.data
     x, y = extract_symbols(problem)
@@ -141,6 +142,7 @@ def is_elementary(expr):
 
 #random problem gen, pretty self explanitory code
 def gen_ode1_bernoulli(difficulty, with_ics=True):
+    """Make a random Bernoulli ODE (with a check that the integral is elementary)"""
     x = sp.Symbol("x")
     y = sp.Function("y")(x)
 

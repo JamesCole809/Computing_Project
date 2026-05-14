@@ -8,6 +8,7 @@ from project import (
 
 
 def solve_ode_sys2_linear(problem, want_steps, want_verify):
+    """Solve a coupled first order linear system by eliminating one variable into a second order ODE"""
     d = problem.data
     x, (u, v) = extract_symbols(problem)
     funcs = d["functions"]
@@ -110,8 +111,8 @@ def solve_ode_sys2_linear(problem, want_steps, want_verify):
         warnings=[])
 
 
-#Yes this is messy and ugly but best way to do it when comparing to problem sheet questions etc
 def gen_ode_sys2_linear(difficulty, with_ics=True):
+    """Make a random coupled first order linear system"""
     x = sp.Symbol("x")
     u = sp.Function("u")(x)
     v = sp.Function("v")(x)

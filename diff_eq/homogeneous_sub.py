@@ -8,6 +8,7 @@ from project import (
 
 
 def solve_ode1_homogeneous_sub(problem, want_steps, want_verify):
+    """Homogeneous ODE using z = y/x to turn it into a separable one"""
     d = problem.data
     x, y = extract_symbols(problem)
     eq = d["equations"]
@@ -45,7 +46,7 @@ def solve_ode1_homogeneous_sub(problem, want_steps, want_verify):
 
     if 0 not in domain_excludes:
         domain_excludes.append(0)
-        warnings.append("Substitution z = y/x requires x != 0") #my keyboard doesn't have the not equal to symbol
+        warnings.append("Substitution z = y/x requires x != 0")
 
     if want_steps:
         steps.append(Step(
@@ -187,6 +188,7 @@ def solve_ode1_homogeneous_sub(problem, want_steps, want_verify):
 
 
 def gen_ode1_homogeneous_sub(difficulty, with_ics=True):
+    """Make a random homogeneous (z = y/x) ODE"""
     x = sp.Symbol("x")
     y = sp.Function("y")(x)
     z = sp.Symbol("z")
