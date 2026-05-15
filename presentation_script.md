@@ -72,18 +72,27 @@ head between points so it isn't a static slide for 90 sec.
 - Top level: `generate` -> Problem, `solve` -> Solution with answer +
   steps + a verified flag.
 
-### 2:30-5:30 — Demo (James, in the notebook)
-**On screen:** full-screen screen capture of the notebook, webcam as a
-small picture-in-picture in a corner. Voice runs the whole time.
+### 2:30-5:30 — Demo (split 50/50, in the notebook)
+**On screen:** full-screen screen capture of the notebook, voiceover the
+whole time (webcam PiP optional). Recorded as two separate clips and
+stitched, so the hand-off just needs a clean line.
+
+**2:30-4:00 — James (generate and solve):**
 - Import as `ml`.
 - `ml.generate("ode1_bernoulli", difficulty="medium")` — show LaTeX question.
 - `ml.solve(problem)` — show answer.
 - `result.show_steps()` — this is the point: full working, same shape
   as on paper.
-- `result.verified` -> True (plugged back into the ODE and checked).
+- Hand off: "...and to show it's actually correct and what else it can
+  do, I'll pass over to Gruff."
+
+**4:00-5:30 — Gruff (verify, sheets, web UI):**
+- `result.verified` -> True (plugged back into the ODE and checked) —
+  explain this is the answer substituted back into the original ODE.
 - `ml.problem_sheet(n=10, kind="mixed", export=True)` — open the PDF for
   two seconds.
-- Mention `ml.launch_web()` exists (only click through it if time).
+- Mention/show `ml.launch_web()` — click through generate/solve/plot if
+  time, otherwise just say it exists.
 
 ### 5:30-6:30 — How a solver works (Gruff)
 **On screen:** the one Bernoulli-formula slide. Cut away from it the
