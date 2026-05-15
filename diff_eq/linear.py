@@ -57,7 +57,7 @@ def solve_ode1_linear(problem, want_steps, want_verify):
             str("Multiply both sides by this to make LHS a product rule derivative")))
         steps.append(Step("Multiply entire equation by I",
             str(rf"{to_latex(mu)} \cdot \frac{{dy}}{{dx}} + {to_latex(mu)} \left({to_latex(p)}\right) y = {to_latex(mu)} \left({to_latex(q)}\right)"),
-            str("LHS is now d/dx[I(x)*y]")))
+            str("LHS is now d/dx of I(x) times y")))
         steps.append(Step("Rewrite LHS as a single derivative",
             str(rf"\frac{{d}}{{dx}}\!\left[{to_latex(mu)} \cdot y\right] = {to_latex(mu)} \left({to_latex(q)}\right)"),
             str("This is product rule in reverse")))
@@ -110,31 +110,46 @@ def solve_ode1_linear(problem, want_steps, want_verify):
 #function to generate random problems
 def gen_ode1_linear(difficulty, with_ics=True):
     """Make a random first order linear ODE"""
+    from .bernoulli import is_elementary
     x = sp.Symbol("x")
     y = sp.Function("y")(x)
 
     #difficulty
-    if difficulty == "easy":
-        p = random.choice([1, 2, -1, 3, -2])
-        q = random.choice([x, 1, sp.exp(x), sp.sin(x), x**2])
-        x0 = random.choice([0, 1])
-        y0 = random.choice([-3, -2, -1, 1, 2, 3])
+    def pick():
+        if difficulty == "easy":
+            p = random.choice([1, 2, -1, 3, -2])
+            q = random.choice([x, 1, sp.exp(x), sp.sin(x), x**2])
+            x0 = random.choice([0, 1])
+            y0 = random.choice([-3, -2, -1, 1, 2, 3])
 
-    elif difficulty == "medium":
-        k = random.choice([1, 2, 3, -1, -2])
-        p = k / x
-        q = random.choice([x, x**2, sp.exp(x), sp.sin(x),
-                         random.choice([-5, -4, -3, -2, -1, 1, 2, 3, 4, 5]) * x])
-        x0 = random.choice([1, 2])
-        y0 = random.choice([-5, -4, -3, -2, -1, 1, 2, 3, 4, 5])
+        elif difficulty == "medium":
+            k = random.choice([1, 2, 3, -1, -2])
+            p = k / x
+            q = random.choice([x, x**2, sp.exp(x), sp.sin(x),
+                             random.choice([-5, -4, -3, -2, -1, 1, 2, 3, 4, 5]) * x])
+            x0 = random.choice([1, 2])
+            y0 = random.choice([-5, -4, -3, -2, -1, 1, 2, 3, 4, 5])
 
+        else:
+            p = random.choice([1/x, 2/x, 3/x, x, sp.cos(x)])
+            q = random.choice([x**2, sp.exp(x), x * sp.exp(x),
+                             sp.sin(x), sp.cos(x)])
+            has_x_denom = p in [1/x, 2/x, 3/x]
+            x0 = random.choice([1, 2]) if has_x_denom else random.choice([0, 1])
+            y0 = random.choice(list(range(-10, 0)) + list(range(1, 11)))
+        return p, q, x0, y0
+
+    #some p/q combos give a non elementary integral (e.g. cos(x) -> e^sin(x)),
+    #retry until the integrating factor integral actually evaluates
+    p, q, x0, y0 = pick()
+    for _attempt in range(8):
+        mu = sp.exp(sp.integrate(p, x))
+        rhs = sp.integrate(mu * q, x)
+        if is_elementary(mu) and is_elementary(rhs):
+            break
+        p, q, x0, y0 = pick()
     else:
-        p = random.choice([1/x, 2/x, 3/x, x, sp.cos(x)])
-        q = random.choice([x**2, sp.exp(x), x * sp.exp(x),
-                         sp.sin(x), sp.cos(x)])
-        has_x_denom = p in [1/x, 2/x, 3/x]
-        x0 = random.choice([1, 2]) if has_x_denom else random.choice([0, 1])
-        y0 = random.choice(list(range(-10, 0)) + list(range(1, 11)))
+        p, q, x0, y0 = 1, x, 0, 1
 
     eq = sp.Eq(y.diff(x) + p * y, q)
     ics = []
